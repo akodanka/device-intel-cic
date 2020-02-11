@@ -1,0 +1,51 @@
+From 46319c9399da723fe509861113b368064441f4f9 Mon Sep 17 00:00:00 2001
+From: akodanka <anoob.anto.kodankandath@intel.com>
+Date: Tue, 11 Feb 2020 18:49:24 +0530
+Subject: [PATCH] Changes to enable Headphone detection in CIC
+
+Tracked-On:
+Signed-off-by: akodanka <anoob.anto.kodankandath@intel.com>
+---
+ core/res/res/values/config.xml                               | 2 +-
+ .../core/java/com/android/server/WiredAccessoryManager.java  | 5 ++++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/core/res/res/values/config.xml b/core/res/res/values/config.xml
+index da6b19dac1c..21e524985f9 100644
+--- a/core/res/res/values/config.xml
++++ b/core/res/res/values/config.xml
+@@ -2322,7 +2322,7 @@
+ 
+     <!-- When true use the linux /dev/input/event subsystem to detect the switch changes
+          on the headphone/microphone jack. When false use the older uevent framework. -->
+-    <bool name="config_useDevInputEventForAudioJack">false</bool>
++    <bool name="config_useDevInputEventForAudioJack">true</bool>
+ 
+     <!-- Whether safe headphone volume is enabled or not (country specific). -->
+     <bool name="config_safe_media_volume_enabled">true</bool>
+diff --git a/services/core/java/com/android/server/WiredAccessoryManager.java b/services/core/java/com/android/server/WiredAccessoryManager.java
+index fcda83d30f1..b1694878ea0 100644
+--- a/services/core/java/com/android/server/WiredAccessoryManager.java
++++ b/services/core/java/com/android/server/WiredAccessoryManager.java
+@@ -122,7 +122,7 @@ final class WiredAccessoryManager implements WiredAccessoryCallbacks {
+     public void notifyWiredAccessoryChanged(long whenNanos, int switchValues, int switchMask) {
+         if (LOG) Slog.v(TAG, "notifyWiredAccessoryChanged: when=" + whenNanos
+                 + " bits=" + switchCodeToString(switchValues, switchMask)
+-                + " mask=" + Integer.toHexString(switchMask));
++                + " mask=" + Integer.toHexString(switchMask) + " mSwitchValues=" + Integer.toHexString(mSwitchValues));
+ 
+         synchronized (mLock) {
+             int headset;
+@@ -145,6 +145,9 @@ final class WiredAccessoryManager implements WiredAccessoryCallbacks {
+                     headset = BIT_HEADSET;
+                     break;
+ 
++                case SW_HEADPHONE_INSERT_BIT | SW_LINEOUT_INSERT_BIT:
++                    headset = BIT_HEADSET;
++
+                 case SW_MICROPHONE_INSERT_BIT:
+                     headset = BIT_HEADSET;
+                     break;
+-- 
+2.17.1
+
